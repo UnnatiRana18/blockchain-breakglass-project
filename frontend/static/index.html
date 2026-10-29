@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain-Based Controlled Emergency Access to Patient Data</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">🛡️</div>
+                <div>
+                    <h1>Blockchain-Based Controlled Emergency Access</h1>
+                    <p class="tagline">Permissioned "Break-Glass" Smart Contract System with Time-Bound Auto-Expiry</p>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="badge badge-success"><span class="dot"></span> Consortium Active</span>
+                <span class="badge badge-outline" id="network-node">Node: HospConsortium-01</span>
+                <span class="badge badge-time" id="system-clock">--:--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-container">
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="doctor-tab">
+                <span class="tab-icon">🩺</span> Doctor Emergency Portal (Break-Glass)
+            </button>
+            <button class="tab-btn" data-tab="audit-tab">
+                <span class="tab-icon">🔍</span> Patient & Auditor Transparency Portal
+            </button>
+            <button class="tab-btn" data-tab="benchmark-tab">
+                <span class="tab-icon">⚡</span> Performance & Latency Lab
+            </button>
+        </nav>
+    </div>
+
+    <main class="main-content">
+        <section id="doctor-tab" class="tab-pane active">
+            <div class="grid-2col">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🚨 Emergency Access Authorization Form</h2>
+                        <span class="badge badge-danger">Immediate Clinical Triage</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="break-glass-form">
+                            <div class="form-group">
+                                <label for="doctor-select">Attending Emergency Physician</label>
+                                <select id="doctor-select" class="form-control" required></select>
+                                <small class="form-text" id="doctor-meta">Verifying on-chain certification status...</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="patient-select">Emergency Patient (Triage Queue)</label>
+                                <select id="patient-select" class="form-control" required></select>
+                                <small class="form-text" id="patient-triage-info">Select patient to view clinical condition</small>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-half">
+                                    <label for="urgency-select">Triage Urgency Level</label>
+                                    <select id="urgency-select" class="form-control">
+                                        <option value="CRITICAL_RESUSCITATION">Critical Resuscitation (Level 1)</option>
+                                        <option value="URGENT">Emergent / Unstable (Level 2)</option>
+                                        <option value="MODERATE">Urgent Care (Level 3)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-half">
+                                    <label for="duration-select">Access Window (Auto-Expiry)</label>
+                                    <select id="duration-select" class="form-control">
+                                        <option value="90">90 Seconds (Quick Demo Auto-Expiry)</option>
+                                        <option value="300">5 Minutes (Acute Resuscitation)</option>
+                                        <option value="900">15 Minutes (Trauma Triage)</option>
+                                        <option value="1800" selected>30 Minutes (Standard Clinical Window)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="reason-input">Clinical Justification & Reason</label>
+                                <div class="quick-reasons">
+                                    <button type="button" class="btn-chip" data-reason="Unconscious trauma patient with acute head injury. Urgent blood cross-match and drug allergy verification required.">Trauma / Unconscious</button>
+                                    <button type="button" class="btn-chip" data-reason="Severe anaphylactic shock with acute respiratory distress. Immediate allergy history needed.">Severe Anaphylaxis</button>
+                                    <button type="button" class="btn-chip" data-reason="Acute myocardial infarction; checking prior anticoagulant medications and contraindications.">Acute STEMI</button>
+                                </div>
+                                <textarea id="reason-input" class="form-control" rows="3" placeholder="Enter clinical reason for break-glass override..." required></textarea>
+                            </div>
+
+                            <button type="submit" id="btn-break-glass" class="btn btn-emergency">
+                                <span class="btn-icon">⚡</span> TRIGGER BREAK-GLASS EMERGENCY OVERRIDE
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card" id="session-card">
+                    <div class="card-header">
+                        <h2>⏱️ Active Emergency Session Monitor</h2>
+                        <span id="session-badge" class="badge badge-secondary">No Active Session</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="no-session-placeholder" class="placeholder-state">
+                            <div class="placeholder-icon">📋</div>
+                            <h3>No Active Emergency Break-Glass Token</h3>
+                            <p>Select an emergency patient and submit the clinical justification form to initiate cryptographic break-glass authorization.</p>
+                        </div>
+
+                        <div id="active-session-view" style="display: none;">
+                            <div class="timer-box">
+                                <div class="timer-label">TIME REMAINING BEFORE AUTOMATIC EXPOSURE REVOCATION</div>
+                                <div class="timer-countdown" id="countdown-timer">00:00</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="timer-progress"></div>
+                                </div>
+                                <div class="timer-footer">
+                                    <span id="expiry-policy-note">Smart contract deterministic auto-expiry enforced</span>
+                                    <button id="btn-early-revoke" class="btn btn-outline-danger btn-sm">Close Session Early</button>
+                                </div>
+                            </div>
+
+                            <div class="grant-meta-box">
+                                <div class="meta-row">
+                                    <span class="meta-label">Grant ID:</span>
+                                    <span class="meta-val mono" id="active-grant-id">--</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span class="meta-label">Block Confirmed:</span>
+                                    <span class="meta-val" id="active-block-info">--</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span class="meta-label">Grant Latency:</span>
+                                    <span class="meta-val highlight" id="active-latency">-- ms</span>
+                                </div>
+                            </div>
+
+                            <div class="medical-records-wrapper">
+                                <div class="medical-records-header">
+                                    <h3>🔓 Decrypted Emergency Clinical Profile</h3>
+                                    <span class="badge badge-success">Emergency Scoped</span>
+                                </div>
+
+                                <div class="medical-grid">
+                                    <div class="med-item critical-bg">
+                                        <div class="med-title">🩸 Blood Group</div>
+                                        <div class="med-val highlight" id="med-blood-group">--</div>
+                                    </div>
+                                    <div class="med-item warning-bg">
+                                        <div class="med-title">⚠️ Documented Allergies</div>
+                                        <div class="med-val" id="med-allergies">--</div>
+                                    </div>
+                                    <div class="med-item">
+                                        <div class="med-title">💊 Active Medications</div>
+                                        <div class="med-val" id="med-medications">--</div>
+                                    </div>
+                                    <div class="med-item">
+                                        <div class="med-title">🩺 Chronic Conditions</div>
+                                        <div class="med-val" id="med-conditions">--</div>
+                                    </div>
+                                    <div class="med-item">
+                                        <div class="med-title">📜 Advance Directives / Code</div>
+                                        <div class="med-val" id="med-resuscitation">--</div>
+                                    </div>
+                                    <div class="med-item">
+                                        <div class="med-title">📞 Emergency Contacts</div>
+                                        <div class="med-val" id="med-contacts">--</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert-box alert-warning" id="med-warning-box">
+                                    <strong>CLINICAL ALERT:</strong> <span id="med-clinical-warning">--</span>
+                                </div>
+
+                                <div class="privacy-guarantee-box">
+                                    <h4>🛡️ Privacy & Minimum Necessary Protection</h4>
+                                    <p>Non-emergency data categories (psychotherapy therapy notes, financial/insurance accounts, genetic profiles) were automatically masked by the access-control protocol.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="expired-session-view" style="display: none;" class="expired-card">
+                            <div class="expired-icon">🔒</div>
+                            <h3>Emergency Access Window Expired</h3>
+                            <p>The time-bound smart contract has automatically revoked access to this patient record. Clinical data has been wiped from memory.</p>
+                            <div class="expired-meta">Zero manual revocation was required. An immutable expiration event was written to the blockchain.</div>
+                            <button id="btn-reset-session" class="btn btn-primary">Start New Emergency Request</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="audit-tab" class="tab-pane">
+            <div class="audit-control-bar">
+                <div class="audit-status-summary">
+                    <div class="stat-badge">
+                        <span class="stat-num" id="stat-blocks-count">0</span>
+                        <span class="stat-label">Committed Blocks</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-num" id="stat-logs-count">0</span>
+                        <span class="stat-label">Audit Log Entries</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-num text-success" id="stat-integrity-status">VALID</span>
+                        <span class="stat-label">Chain State</span>
+                    </div>
+                </div>
+
+                <div class="audit-actions">
+                    <button id="btn-verify-integrity" class="btn btn-success"><span>🛡️</span> Verify Cryptographic Integrity</button>
+                    <button id="btn-simulate-tamper" class="btn btn-outline-danger"><span>⚠️</span> Simulate DB Admin Tamper</button>
+                    <button id="btn-restore-ledger" class="btn btn-outline-secondary" style="display: none;"><span>🔄</span> Restore Original Ledger</button>
+                </div>
+            </div>
+
+            <div id="verification-banner" class="verification-banner banner-pass" style="display: none;">
+                <div class="banner-icon" id="banner-icon">✅</div>
+                <div class="banner-body">
+                    <h3 id="banner-title">Cryptographic Integrity Confirmed</h3>
+                    <p id="banner-desc">Every block hash, previous block link, Merkle root, and chained audit log is 100% intact.</p>
+                    <small id="banner-meta">Verification took 0.00 ms across all blocks.</small>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2>📜 Immutable Access Audit Trail</h2>
+                </div>
+                <div class="card-body no-padding">
+                    <div class="table-responsive">
+                        <table class="table" id="audit-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                    <th>Patient</th>
+                                    <th>Physician</th>
+                                    <th>Data Category</th>
+                                    <th>Payload Hash</th>
+                                    <th>Chained Log Hash</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body">
+                                <tr><td colspan="7" class="text-center">Loading audit records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2>🧱 Blockchain Ledger Blocks</h2>
+                </div>
+                <div class="card-body">
+                    <div class="blocks-container" id="blocks-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="benchmark-tab" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚡ Real-Time Latency & Security Comparative Benchmark</h2>
+                    <button id="btn-run-benchmark" class="btn btn-primary"><span>🚀</span> Run 50-Cycle Benchmark Test</button>
+                </div>
+                <div class="card-body">
+                    <div class="benchmark-results-grid" id="benchmark-results">
+                        <div class="metric-card">
+                            <div class="metric-title">Smart Contract Grant Latency</div>
+                            <div class="metric-value highlight" id="bench-smart-lat">-- ms</div>
+                            <div class="metric-sub" id="bench-smart-range">Min: -- | Max: --</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Centralized Baseline Latency</div>
+                            <div class="metric-value" id="bench-cent-lat">-- ms</div>
+                            <div class="metric-sub">Direct unverified DB write</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Cryptographic Overhead</div>
+                            <div class="metric-value text-success" id="bench-overhead">-- ms</div>
+                            <div class="metric-sub">Clinical SLA: &lt; 500ms</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Tamper-Proof Guarantee</div>
+                            <div class="metric-value text-success">100%</div>
+                            <div class="metric-sub">Mathematically provable</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>Blockchain-Based Controlled Emergency Access to Patient Data | Academic Research Prototype</p>
+        <p class="authors">Authors: Unnati Rana (ENG23CS0670), Shruthi Mohan (ENG23CS0186), Sayee Dahake (ENG23CS0448), Sanvi Agarwal (Eng23CS0650)</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
